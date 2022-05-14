@@ -12,20 +12,17 @@ import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 
 public class qb{
-    private boolean rotX, rotY, rotZ;
     private float rotation = (float)PI/30f;
-    private int rotInt = 0;
     private int currentWall, currentColumn, currentRow;
     int wall, coll, row;
+    private float move = 1.0f;
     public boolean rotating = false;
     private float tempRotateY, tempRotateX, tempRotateZ = 0f;
     private final GL2 gl;
     private String qbTag;
     private boolean rotatingX, rotatingY, rotatingZ;
-    public boolean axis = true, walls=true;
     public String[] colors = {"", "", "", "", "", ""};
-    private float rotaX = 0f, rotaY = 0f, rotaZ = 0f;
-    private float[] axisX = {1f,0f,0f},axisY = {0f,1f,0f},axisZ = {0f,0f,1f};
+    private final float[] axisZ = {0f,0f,1f}, axisY = {0f,1f,0f}, axisX = {1f,0f,0f};
     private Quaternion calcMat = new Quaternion().setIdentity();
     private Quaternion stableMat = new Quaternion().setIdentity();
     float[] tempVec3 = {0f,0f,0f};
@@ -75,26 +72,25 @@ public class qb{
         preRotate();
         translateGL( wall, coll, row);
 
-        if (walls) {
-            if (!Objects.equals(colors[0], "")) { //Colors 0 First Wall
-                wallFWD(colors[0]);
-            }
-            if (!Objects.equals(colors[1], "")) { //Colors 1 Last Wall
-                wallBWD(colors[1]);
-            }
-            if (!Objects.equals(colors[2], "")) { //Colors 2 Last Column
-                wallRight(colors[2]);
-            }
-            if (!Objects.equals(colors[3], "")) { //Colors 3 First Column
-                wallLeft(colors[3]);
-            }
-            if (!Objects.equals(colors[4], "")) { //Colors 4 First Row
-                wallDOWN(colors[4]);
-            }
-            if (!Objects.equals(colors[5], "")) { //Colors 5 Last Row
-                wallUP(colors[5]);
-            }
+        if (!Objects.equals(colors[0], "")) { //Colors 0 First Wall
+            wallFWD(colors[0]);
         }
+        if (!Objects.equals(colors[1], "")) { //Colors 1 Last Wall
+            wallBWD(colors[1]);
+        }
+        if (!Objects.equals(colors[2], "")) { //Colors 2 Last Column
+            wallRight(colors[2]);
+        }
+        if (!Objects.equals(colors[3], "")) { //Colors 3 First Column
+            wallLeft(colors[3]);
+        }
+        if (!Objects.equals(colors[4], "")) { //Colors 4 First Row
+            wallDOWN(colors[4]);
+        }
+        if (!Objects.equals(colors[5], "")) { //Colors 5 Last Row
+            wallUP(colors[5]);
+        }
+
     }
     private float limitRotate(float rotate){
         //to not over rotate check
@@ -169,7 +165,6 @@ public class qb{
 
     }
 
-    private float move = 1.0f;
 
     private Quaternion rotationManip(float angle, float[] axis, Quaternion currentMat){
         float[] tempVec3 = {0f,0f,0f};

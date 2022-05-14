@@ -41,28 +41,19 @@ public class main extends JFrame implements GLEventListener, KeyListener {
         canvas.addGLEventListener(this);
         setLayout(new BorderLayout());
         add(canvas);
+        JPanel panelBottom = new JPanel(new FlowLayout());
         JButton btnReset = new JButton("RESET");
         JButton btnShuffle  = new JButton("SHUFFLE");
+        panelBottom.add(btnReset);
+        panelBottom.add(btnShuffle);
        // add(btnReset, BorderLayout.SOUTH);
-        add(btnShuffle, BorderLayout.SOUTH);
+        add(panelBottom, BorderLayout.SOUTH);
         setVisible(true);
         final FPSAnimator animator = new FPSAnimator(canvas,60,true);
         animator.start();
         canvas.addKeyListener(this);
-        btnReset.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cube = new cube(gl, textures, 3);
-            }
-        });
-
-        btnShuffle.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                cube.shuffle(0);
-            }
-        });
+        btnReset.addActionListener(e -> cube = new cube(gl, textures, 3));
+        btnShuffle.addActionListener(e -> cube.shuffle(0));
 
     }
 

@@ -98,7 +98,6 @@ public class cube{
             for( int j = 0;j<this.size;j++){ //column
 
                 for( int k = 0;k<this.size;k++){ // rows
-                    this.cube[i][j][k].walls = true;
                     gl.glPushMatrix();
                     this.cube[i][j][k].location(i, j, k);
                     if (rotateReq){
@@ -154,7 +153,7 @@ public class cube{
     }
 
     public void shuffle(int times) {
-        shuffle = true;
+        shuffle = !shuffle;
         shuffleTimes = times;
         shuffle();
     }
