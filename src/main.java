@@ -70,7 +70,11 @@ public class main extends JFrame implements GLEventListener, KeyListener {
     public void keyReleased(KeyEvent e) {
         System.out.println(e.getKeyChar());
         switch (e.getKeyChar()) {
-
+            /*
+            section 0:rows; 1:walls; 2:columns;
+            direction 1:clockwise; -1:counterclockwise;
+            Shift+Letter for direction change
+             */
             case 'e' -> cube.startRotate(0,0,1);
             case 'd' -> cube.startRotate(0,1,1);
             case 'c' -> cube.startRotate(0,2,1);
@@ -83,16 +87,20 @@ public class main extends JFrame implements GLEventListener, KeyListener {
             case 'a' -> cube.startRotate(2,1,1);
             case 'z' -> cube.startRotate(2,2,1);
 
+            case 'E' -> cube.startRotate(0,0,-1);
+            case 'D' -> cube.startRotate(0,1,-1);
+            case 'C' -> cube.startRotate(0,2,-1);
+
+            case 'W' -> cube.startRotate(1,0,-1);
+            case 'S' -> cube.startRotate(1,1,-1);
+            case 'X' -> cube.startRotate(1,2,-1);
+
+            case 'Q' -> cube.startRotate(2,0,-1);
+            case 'A' -> cube.startRotate(2,1,-1);
+            case 'Z' -> cube.startRotate(2,2,-1);
+
         }
     }
-
-    static void setHexColor(GL2 gl, String color){
-                    int r = Integer.valueOf( color.substring( 1, 3 ), 16 );
-                    int g = Integer.valueOf( color.substring( 3, 5 ), 16 );
-                    int b = Integer.valueOf( color.substring( 5, 7 ), 16 );
-
-        gl.glColor3f( (float)r/255.0f, (float)g/255.0f, (float)b/255.0f);
-        }
 
     @Override
     public void display(GLAutoDrawable drawable) {
