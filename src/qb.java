@@ -3,6 +3,7 @@ import com.jogamp.opengl.GL2;
 import static com.jogamp.opengl.GL2.*;
 import com.jogamp.opengl.math.*;
 
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +39,19 @@ public class qb{
 
 
     }
+    private void lighting(){
+
+        gl.glDepthFunc(gl.GL_LEQUAL);
+        gl.glShadeModel(gl.GL_SMOOTH);
+
+        gl.glLightModelfv(gl.GL_LIGHT_MODEL_AMBIENT, FloatBuffer.wrap(new float[] {1f, 1f, 1f, 1f}));
+
+        gl.glLightfv(gl.GL_LIGHT1, gl.GL_DIFFUSE, FloatBuffer.wrap(new float[] { 1f, 1f, 1f, 0f}));
+        gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION, FloatBuffer.wrap(new float[] { 0.5f, 0.5f, 3.5f, 0f}));
+
+        gl.glEnable(gl.GL_LIGHTING);
+        gl.glEnable(gl.GL_LIGHT1);
+    }
 
     public void initSides(int size, List<Integer> textures) {
         this.textures = textures;
@@ -59,6 +73,7 @@ public class qb{
         if (row == size-1) { //Colors 5
             colors[5] = "#FFFFFF";
         }
+
     }
 
     private void setQbTag(String tag) {
@@ -69,8 +84,20 @@ public class qb{
     }
 
     void draw(int size){
+
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(0));
+        gl.glBegin(GL_QUADS);
+        gl.glNormal3f(0.0f, 0.0f, 1.0f);
+        gl.glTexCoord2f(0.0f,0.0f); gl.glVertex3f(  10.5f, -10.5f, -2.5f );
+        gl.glTexCoord2f(1.0f,0.0f); gl.glVertex3f(  10.5f,  10.5f, -2.5f );
+        gl.glTexCoord2f(1.0f,1.0f); gl.glVertex3f( -10.5f,  10.5f, -2.5f );
+        gl.glTexCoord2f(0.0f,1.0f); gl.glVertex3f( -10.5f, -10.5f, -2.5f );
+        gl.glEnd();
+
         preRotate();
+
         translateGL( wall, coll, row);
+
 
         if (!Objects.equals(colors[0], "")) { //Colors 0 First Wall
             wallFWD(colors[0]);
@@ -162,6 +189,7 @@ public class qb{
         rotating = this.rotatingX || this.rotatingY || this.rotatingZ;
 
         gl.glLoadMatrixf(calcMat.toMatrix(tempMat4, 0), 0);
+        lighting();
 
     }
 
@@ -177,7 +205,7 @@ public class qb{
     private void wallFWD(String Color) {
         gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(0));
         gl.glBegin(GL_QUADS);
-        gl.glNormal3f(0.0f, 0.0f, 1.0f);
+        gl.glNormal3f(1.0f, 1.0f, 1.0f);
         gl.glTexCoord2f(0.0f,0.0f); gl.glVertex3f(  0.5f, -0.5f, 0.5f );
         gl.glTexCoord2f(1.0f,0.0f); gl.glVertex3f(  0.5f,  0.5f, 0.5f );
         gl.glTexCoord2f(1.0f,1.0f); gl.glVertex3f( -0.5f,  0.5f, 0.5f );
@@ -187,7 +215,7 @@ public class qb{
     private void wallBWD(String Color) {
         gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(1));
         gl.glBegin(GL_QUADS);
-        gl.glNormal3f(0.0f, 0.0f, 1.0f);
+     //   gl.glNormal3f(0.0f, 0.0f, 1.0f);
        gl.glTexCoord2f(0.0f,0.0f);gl.glVertex3f( -0.5f, -0.5f, -0.5f );
        gl.glTexCoord2f(1.0f,0.0f);gl.glVertex3f( -0.5f,  0.5f, -0.5f );
        gl.glTexCoord2f(1.0f,1.0f);gl.glVertex3f(  0.5f,  0.5f, -0.5f );
@@ -197,7 +225,7 @@ public class qb{
     private void wallLeft(String Color){
         gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(2));
         gl.glBegin(GL_QUADS);
-        gl.glNormal3f(0.0f, 0.0f, 1.0f);
+      //  gl.glNormal3f(0.0f, 0.0f, 1.0f);
         gl.glTexCoord2f(0.0f,0.0f);gl.glVertex3f( 0.5f, -0.5f, 0.5f );
         gl.glTexCoord2f(1.0f,0.0f);gl.glVertex3f( 0.5f,  -0.5f, -0.5f );
         gl.glTexCoord2f(1.0f,1.0f);gl.glVertex3f(  0.5f,  0.5f, -0.5f );
@@ -207,7 +235,7 @@ public class qb{
     private void wallRight(String Color){
        gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(3));
         gl.glBegin(GL_QUADS);
-        gl.glNormal3f(0.0f, 0.0f, 1.0f);
+       // gl.glNormal3f(0.0f, 0.0f, 1.0f);
        gl.glTexCoord2f(0.0f,0.0f);gl.glVertex3f(  -0.5f, 0.5f, 0.5f );
        gl.glTexCoord2f(1.0f,0.0f);gl.glVertex3f(  -0.5f,  0.5f, -0.5f );
        gl.glTexCoord2f(1.0f,1.0f);gl.glVertex3f( -0.5f,  -0.5f, -0.5f );
@@ -217,7 +245,7 @@ public class qb{
     private void wallUP(String Color){
         gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(4));
         gl.glBegin(GL_QUADS);
-        gl.glNormal3f(0.0f, 0.0f, 1.0f);
+       // gl.glNormal3f(0.0f, 0.0f, 1.0f);
        gl.glTexCoord2f(0.0f,0.0f);gl.glVertex3f(  0.5f, -0.5f, 0.5f );
        gl.glTexCoord2f(1.0f,0.0f);gl.glVertex3f(  -0.5f,  -0.5f, 0.5f );
        gl.glTexCoord2f(1.0f,1.0f);gl.glVertex3f( -0.5f,  -0.5f, -0.5f );
@@ -227,8 +255,7 @@ public class qb{
     private void wallDOWN(String Color){
         gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(5));
         gl.glBegin(GL_QUADS);
-        gl.glNormal3f(0.0f, 0.0f, 1.0f);
-      //  p07.setHexColor(gl, Color);
+        //gl.glNormal3f(0.0f, 0.0f, 1.0f);
        gl.glTexCoord2f(0.0f,0.0f); gl.glVertex3f( 0.5f, 0.5f, -0.5f );
        gl.glTexCoord2f(1.0f,0.0f); gl.glVertex3f( -0.5f,0.5f, -0.5f );
        gl.glTexCoord2f(1.0f,1.0f); gl.glVertex3f(  -0.5f,  0.5f, 0.5f );

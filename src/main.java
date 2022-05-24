@@ -1,3 +1,5 @@
+import com.jogamp.newt.event.MouseEvent;
+import com.jogamp.newt.event.MouseListener;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.glu.GLU;
@@ -7,12 +9,10 @@ import com.jogamp.opengl.util.texture.TextureIO;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.List;
 import static com.jogamp.opengl.GL.*;
 
 
-public class main extends JFrame implements GLEventListener, KeyListener {
+public class main extends JFrame implements GLEventListener, KeyListener{
 
     private GLU glu = new GLU();
     cube cube;
@@ -28,6 +28,11 @@ public class main extends JFrame implements GLEventListener, KeyListener {
     private float aspect;
     List<Integer> textures = new ArrayList<Integer>();
     private final String[] colors = {"red", "green", "blue", "orange", "yellow", "white"};
+    private int mouseX = 0;
+    private int mouseY = 0;
+    private float cameraAngleX = 5f;
+    private float cameraAngleY = 5f;
+    private float cameraAngleZ = 5f;
     public main(String string) {
 
         super(string);
@@ -35,10 +40,29 @@ public class main extends JFrame implements GLEventListener, KeyListener {
         Toolkit kit=Toolkit.getDefaultToolkit();
         Dimension d=kit.getScreenSize();
         setBounds(d.width/4, d.height/4, d.width/2, d.height/2);
+        mouseX = d.width/2;
+        mouseY = d.height/2;
         GLProfile profile=GLProfile.get(GLProfile.GL2);
         GLCapabilities capabilities=new GLCapabilities(profile);
         GLCanvas canvas=new GLCanvas(capabilities);
         canvas.addGLEventListener(this);
+        canvas.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(java.awt.event.MouseEvent e) {
+                super.mouseDragged(e);
+                final int buffer = 2;
+
+                if (e.getX() < mouseX - buffer) cameraAngleY -= 1;
+                else if (e.getX() > mouseX + buffer) cameraAngleY += 1;
+
+                if (e.getY() < mouseY - buffer) cameraAngleX -= 1;
+                else if (e.getY() > mouseY + buffer) cameraAngleX += 1;
+                System.out.println("mouse");
+                mouseX = e.getX();
+                mouseY = e.getY();
+            }
+        });
+
         setLayout(new BorderLayout());
         add(canvas);
         JPanel panelBottom = new JPanel(new FlowLayout());
@@ -56,7 +80,6 @@ public class main extends JFrame implements GLEventListener, KeyListener {
         btnShuffle.addActionListener(e -> cube.shuffle(0));
 
     }
-
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -102,12 +125,21 @@ public class main extends JFrame implements GLEventListener, KeyListener {
         }
     }
 
+
     @Override
     public void display(GLAutoDrawable drawable) {
         final GL2 gl = drawable.getGL().getGL2();
         gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        gl.glLoadIdentity();
+        cube.setCameraAngle(cameraAngleX, cameraAngleY, cameraAngleZ);
         cube.rebuild();
+
         camera(aspect);
+
+        gl.glFlush();
+        gl.glLoadIdentity();
+
+
 
     }
 
@@ -158,7 +190,7 @@ public void camera(float aspect){
     gl.glMatrixMode(GL2.GL_PROJECTION);
     gl.glLoadIdentity();
     glu.gluPerspective(60.0, aspect, 1.0, 20f);
-    glu.gluLookAt(5.0f, 5f, 5f,
+    glu.gluLookAt(7.0f, 5f, 5f,
             0.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f);
     gl.glMatrixMode(GL2.GL_MODELVIEW);
@@ -172,5 +204,7 @@ public void camera(float aspect){
             }
         });
     }
+
+
 
 }

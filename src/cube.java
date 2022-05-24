@@ -95,6 +95,7 @@ public class cube{
         allowRotate = false;
 
         for( int i = 0;i<this.size;i++){ //walls
+
             for( int j = 0;j<this.size;j++){ //column
 
                 for( int k = 0;k<this.size;k++){ // rows
@@ -103,8 +104,11 @@ public class cube{
                     if (rotateReq){
                         this.cube[i][j][k].rotate(section ,phase, direction);
                     }
+
                     drawQb(i,j,k);
+
                     gl.glPopMatrix();
+
                 }
             }
             allowRotate = true;
@@ -162,5 +166,9 @@ public class cube{
         if (shuffleTimes == 0) shuffle = false;
         Random rand = new Random();
         this.startRotate(rand.nextInt(3), rand.nextInt(3), rand.nextInt(3));
+    }
+
+    public void setCameraAngle(float cameraAngleX, float cameraAngleY, float cameraAngleZ) {
+        ///tbc global object rotate simulate camera rotations
     }
 }
