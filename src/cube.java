@@ -108,6 +108,17 @@ public class cube{
                         this.cube[i][j][k].rotate(section ,phase, direction);
                     }
                     this.cube[i][j][k].setGlobalrotate(globalRotate);
+                    float[] lightAmbientValue = {0.5f, 0.5f, 0.5f, 1.0f};
+                    // Diffuse light comes from a particular location. Diffuse's value in RGBA
+                    float[] lightDiffuseValue = {1.0f, 1.0f, 1.0f, 1.0f};
+                    // Diffuse light location xyz (in front of the screen).
+
+                    float[] lightDiffusePosition = {3.0f, 0.0f, 0.0f, 1.0f};
+                    gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION, lightDiffusePosition, 0);
+
+                    gl.glLightfv(gl.GL_LIGHT1, gl.GL_AMBIENT, lightAmbientValue, 0);
+                    gl.glLightfv(gl.GL_LIGHT1, gl.GL_DIFFUSE, lightDiffuseValue, 0);
+                   // gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION, lightDiffusePosition, 0);
                     drawQb(i,j,k);
                     gl.glPopMatrix();
 
@@ -154,6 +165,13 @@ public class cube{
         }
 
     }
+    public void globalRotateX(int direction){
+        if (!this.rotateReq && !this.isRotating()){
+            this.setRotation(section, phase, direction);
+            this.rotateReq = true;
+        }
+
+    }
 
     private void drawQb(int i, int j, int k) {
         this.cube[i][j][k].draw(this.size);
@@ -168,7 +186,7 @@ public class cube{
         shuffleTimes -= 1;
         if (shuffleTimes == 0) shuffle = false;
         Random rand = new Random();
-        this.startRotate(rand.nextInt(3), rand.nextInt(3), rand.nextInt(3));
+        this.startRotate(rand.nextInt(size), rand.nextInt(size), rand.nextInt(size));
     }
 
     public void setCameraAngle(float cameraAngleX, float cameraAngleY, float cameraAngleZ) {
