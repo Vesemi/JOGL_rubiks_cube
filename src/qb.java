@@ -108,7 +108,7 @@ public class qb{
     }
     private void translateGL(int wall, int coll, int row, int size)
     {
-
+        gl.glTranslatef((size-3)/2f, (size-3)/2f, (size-3)/2f);
         gl.glTranslatef(-move*coll+1.0f, -move*row+1.0f, -move*wall+1.0f);
     }
 
