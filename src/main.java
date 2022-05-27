@@ -22,6 +22,7 @@ import static com.jogamp.opengl.GL.*;
 
 public class main extends JFrame implements GLEventListener, KeyListener{
 
+    private  GL2 GL ;
     private GLU glu = new GLU();
     cube cube;
     GL2 gl;
@@ -30,9 +31,9 @@ public class main extends JFrame implements GLEventListener, KeyListener{
     private final String[] colors = {"red", "green", "blue", "orange", "yellow", "white"};
     private int mouseX = 0;
     private int mouseY = 0;
-    private float cameraAngleX = 5f;
-    private float cameraAngleY = 5f;
-    private float cameraAngleZ = 5f;
+    private float cameraAngleX = 0f;
+    private float cameraAngleY = 0f;
+    private float cameraAngleZ = 0f;
     public main(String string) {
 
         super(string);
@@ -50,13 +51,13 @@ public class main extends JFrame implements GLEventListener, KeyListener{
             @Override
             public void mouseDragged(java.awt.event.MouseEvent e) {
                 super.mouseDragged(e);
-                final int buffer = 2;
+                final int buffer = 5;
 
-                if (e.getX() < mouseX - buffer) cameraAngleY -= 1;
-                else if (e.getX() > mouseX + buffer) cameraAngleY += 1;
+                if (e.getX() < mouseX - buffer) cameraAngleY += 0.1;
+                else if (e.getX() > mouseX + buffer) cameraAngleY -= 0.1;
 
-                if (e.getY() < mouseY - buffer) cameraAngleX -= 1;
-                else if (e.getY() > mouseY + buffer) cameraAngleX += 1;
+                if (e.getY() < mouseY - buffer) cameraAngleX += 0.1;
+                else if (e.getY() > mouseY + buffer) cameraAngleX -= 0.1;
                 System.out.println("mouse");
                 mouseX = e.getX();
                 mouseY = e.getY();
@@ -151,7 +152,8 @@ public class main extends JFrame implements GLEventListener, KeyListener{
 
     @Override
     public void init(GLAutoDrawable drawable) {
-        gl=drawable.getGL().getGL2();
+        GL=drawable.getGL().getGL2();
+        gl = drawable.getGL().getGL2();
         gl.glEnable(GL2.GL_CULL_FACE);
         gl.glEnable(GL_DEPTH_TEST);
         gl.glDepthMask(true);
@@ -159,6 +161,17 @@ public class main extends JFrame implements GLEventListener, KeyListener{
         gl.glDepthRangef(0.0f, 1.0f);
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
+        gl.glEnable(GL.GL_LIGHTING);
+        gl.glDepthFunc(gl.GL_LEQUAL);
+        gl.glShadeModel(gl.GL_SMOOTH);
+
+        gl.glLightModelfv(gl.GL_LIGHT_MODEL_AMBIENT, FloatBuffer.wrap(new float[] {1f, 1f, 1f, 1f}));
+
+        gl.glLightfv(gl.GL_LIGHT1, gl.GL_DIFFUSE, FloatBuffer.wrap(new float[] { 1f, 1f, 1f, 0f}));
+        gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION, FloatBuffer.wrap(new float[] { 0.5f, 0.5f, 3.5f, 0f}));
+
+        gl.glEnable(gl.GL_LIGHTING);
+        gl.glEnable(gl.GL_LIGHT1);
         Arrays.stream(colors).forEach((x) -> {
             try{
             File f=new File("textures/%s.png".formatted(x));
@@ -170,7 +183,7 @@ public class main extends JFrame implements GLEventListener, KeyListener{
 
 
 
-        cube = new cube(gl, textures, 3);
+        cube = new cube(gl, textures, 5);
     }
 
 

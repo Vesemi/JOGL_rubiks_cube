@@ -1,5 +1,6 @@
 import com.jogamp.opengl.GL2;
 
+import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.Random;
 
@@ -12,10 +13,12 @@ public class cube{
     private int section, phase, direction;
     private int shuffleTimes;
     private boolean shuffle;
+    private float[] globalRotate = {0f,0f,0f};
 
     public cube(GL2 gl, List<Integer> textures, int size) {
         this.size = size;
         cube = new qb[this.size][this.size][this.size];
+        this.setCameraAngle(0f, 0f, 0f);
         this.gl = gl;
         for( int i = 0;i<this.size;i++){
             for( int j = 0;j<this.size;j++){
@@ -104,14 +107,14 @@ public class cube{
                     if (rotateReq){
                         this.cube[i][j][k].rotate(section ,phase, direction);
                     }
-
+                    this.cube[i][j][k].setGlobalrotate(globalRotate);
                     drawQb(i,j,k);
-
                     gl.glPopMatrix();
 
                 }
             }
             allowRotate = true;
+
         }
 
         if (rotateReq && allowRotate && !this.isRotating()) {
@@ -159,7 +162,7 @@ public class cube{
     public void shuffle(int times) {
         shuffle = !shuffle;
         shuffleTimes = times;
-        shuffle();
+        this.shuffle();
     }
     private void shuffle() {
         shuffleTimes -= 1;
@@ -169,6 +172,8 @@ public class cube{
     }
 
     public void setCameraAngle(float cameraAngleX, float cameraAngleY, float cameraAngleZ) {
-        ///tbc global object rotate simulate camera rotations
+        globalRotate[0] = cameraAngleX;
+        globalRotate[1] = cameraAngleY;
+        globalRotate[2] = cameraAngleZ;
     }
 }
