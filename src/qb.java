@@ -4,6 +4,7 @@ import static com.jogamp.opengl.GL2.*;
 import com.jogamp.opengl.math.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,6 +25,7 @@ public class qb{
     private final float[] axisZ = {0f,0f,1f}, axisY = {0f,1f,0f}, axisX = {1f,0f,0f};
     private Quaternion calcMat = new Quaternion().setIdentity();
     private Quaternion globalMat = new Quaternion().setIdentity();
+    private Quaternion normalMat = new Quaternion().setIdentity();
     float[] tempMat4 = {0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f};
     public List<Integer> textures = new ArrayList<Integer>();
     private float[] globalRotate = {0f,0f,0f};
@@ -81,12 +83,11 @@ public class qb{
     }
 
     void draw(int size){
-        float[] lightDiffusePosition = {3.0f, 0.0f, 0.0f, 1.0f};
+
         preRotate();
-       //
-       // gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION, lightDiffusePosition, 0);
         translateGL( wall, coll, row, size);
-        gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION, lightDiffusePosition, 0);
+
+      //  gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION, lightDiffusePosition, 0);
       // if (!Objects.equals(colors[0], "")) { //Colors 0 First Wall
             wallFWD(colors[0]);
        // }
@@ -168,6 +169,7 @@ public class qb{
             if (tempRotateZ>15){
                 tempRotateZ = 0;
                 rotatingZ = false;
+
             }else {
                 calcMat = rotationManip(-rotation, axisZ, calcMat);
             }
@@ -177,10 +179,8 @@ public class qb{
         globalMat.mult(rotationManip((float) Math.toRadians(globalRotate[1]), axisX, globalMat));
         globalMat.mult(rotationManip((float) Math.toRadians(globalRotate[0]), axisY, globalMat));
         globalMat.mult(calcMat);
+
         gl.glLoadMatrixf(globalMat.toMatrix(tempMat4, 0), 0);
-
-
-
     }
 
 
@@ -191,11 +191,17 @@ public class qb{
         tempQuat.mult(currentMat);
         return tempQuat;
     }
+    private float[] normalCalculations(){
+       float[] tempFloat = new float[] {0f,0f,0f} ;
+       return tempFloat;
+    }
+
 
     private void wallFWD(String Color) {
         if (Objects.equals(Color, "")) gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(6));
         else gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(0));
-        gl.glBegin(GL_POLYGON);
+        gl.glBegin(GL_QUADS);
+
         gl.glNormal3f(0.0f, 0.0f, 1.0f);
         gl.glTexCoord2f(0.0f,0.0f); gl.glVertex3f(  -move/2, -move/2, move/2 );
         gl.glTexCoord2f(1f,0.0f); gl.glVertex3f(  move/2,  -move/2, move/2 );
@@ -206,8 +212,8 @@ public class qb{
     private void wallBWD(String Color) {
         if (Objects.equals(Color, "")) gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(6));
         else gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(1));
-        gl.glBegin(GL_POLYGON);
-        gl.glNormal3f(0.0f, 0.0f, 0.1f);
+        gl.glBegin(GL_QUADS);
+        gl.glNormal3f(.0f, 0.0f, -1.0f);
         gl.glTexCoord2f(1f,0.0f);gl.glVertex3f( move/2, -move/2, -move/2 );
         gl.glTexCoord2f(1f,1.0f);gl.glVertex3f( -move/2,  -move/2, -move/2 );
         gl.glTexCoord2f(0f,1.0f);gl.glVertex3f(  -move/2,  move/2, -move/2 );
@@ -217,8 +223,8 @@ public class qb{
     private void wallLeft(String Color){
         if (Objects.equals(Color, "")) gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(6));
         else gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(2));
-        gl.glBegin(GL_POLYGON);
-        gl.glNormal3f(0.0f, 0.0f, 1.0f);
+        gl.glBegin(GL_QUADS);
+        gl.glNormal3f(1.0f, 0.0f, 0.0f); //checked OK
         gl.glTexCoord2f(0f,0.0f);gl.glVertex3f(  move/2, -move/2, move/2 );
         gl.glTexCoord2f(1f,0.0f);gl.glVertex3f(  move/2,  -move/2, -move/2 );
         gl.glTexCoord2f(1f,1.0f);gl.glVertex3f( move/2,  move/2, -move/2 );
@@ -228,8 +234,8 @@ public class qb{
     private void wallRight(String Color){
         if (Objects.equals(Color, "")) gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(6));
         else gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(3));
-        gl.glBegin(GL_POLYGON);
-        gl.glNormal3f(0.0f, 1.0f, 0.0f);
+        gl.glBegin(GL_QUADS);
+        gl.glNormal3f(-1f, 0.0f, 0.0f);
         gl.glTexCoord2f(0f,0.0f);gl.glVertex3f( -move/2, -move/2, -move/2 );
         gl.glTexCoord2f(0.0f,1.0f);gl.glVertex3f( -move/2,  -move/2, move/2 );
         gl.glTexCoord2f(1.0f,1.0f);gl.glVertex3f(  -move/2,  move/2, move/2 );
@@ -240,8 +246,8 @@ public class qb{
         if (Objects.equals(Color, "")) gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(6));
         else gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(4));
 
-        gl.glBegin(GL_POLYGON);
-        gl.glNormal3f(0.0f, 0.0f, 1.0f);
+        gl.glBegin(GL_QUADS);
+        gl.glNormal3f(0.0f, -1.0f, 0.0f);
         gl.glTexCoord2f(0.0f,0.0f); gl.glVertex3f( -move/2, -move/2, -move/2 );
         gl.glTexCoord2f(1.0f,0.0f); gl.glVertex3f( move/2,-move/2, -move/2 );
         gl.glTexCoord2f(1.0f,1.0f); gl.glVertex3f(  move/2,  -move/2, move/2 );
@@ -252,7 +258,7 @@ public class qb{
     private void wallDOWN(String Color){
         if (Objects.equals(Color, "")) gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(6));
         else gl.glBindTexture(GL2.GL_TEXTURE_2D, textures.get(5));
-        gl.glBegin(GL_POLYGON);
+        gl.glBegin(GL_QUADS);
         gl.glNormal3f(0.0f, 1.0f, 0.0f);
         gl.glTexCoord2f(0.0f,0.0f);gl.glVertex3f(  -move/2, move/2, move/2 );
         gl.glTexCoord2f(1.0f,0.0f);gl.glVertex3f(  move/2,  move/2, move/2 );

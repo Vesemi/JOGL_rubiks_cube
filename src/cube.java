@@ -108,24 +108,13 @@ public class cube{
                         this.cube[i][j][k].rotate(section ,phase, direction);
                     }
                     this.cube[i][j][k].setGlobalrotate(globalRotate);
-                    float[] lightAmbientValue = {0.5f, 0.5f, 0.5f, 1.0f};
-                    // Diffuse light comes from a particular location. Diffuse's value in RGBA
-                    float[] lightDiffuseValue = {1.0f, 1.0f, 1.0f, 1.0f};
-                    // Diffuse light location xyz (in front of the screen).
 
-                    float[] lightDiffusePosition = {3.0f, 0.0f, 0.0f, 1.0f};
-                    gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION, lightDiffusePosition, 0);
-
-                    gl.glLightfv(gl.GL_LIGHT1, gl.GL_AMBIENT, lightAmbientValue, 0);
-                    gl.glLightfv(gl.GL_LIGHT1, gl.GL_DIFFUSE, lightDiffuseValue, 0);
-                   // gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION, lightDiffusePosition, 0);
                     drawQb(i,j,k);
                     gl.glPopMatrix();
-
-                }
+                                    }
             }
             allowRotate = true;
-
+            
         }
 
         if (rotateReq && allowRotate && !this.isRotating()) {
