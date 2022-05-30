@@ -1,6 +1,5 @@
 import com.jogamp.opengl.GL2;
 
-import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.Random;
 
@@ -94,7 +93,7 @@ public class cube{
     private void setQb(qb qb, int wall, int column, int row) {
         this.cube[wall][column][row] = qb;
     }
-    public void rebuild() {
+    public void rebuild(float rotationSpeed) {
         allowRotate = false;
 
         for( int i = 0;i<this.size;i++){ //walls
@@ -105,7 +104,7 @@ public class cube{
                     gl.glPushMatrix();
                     this.cube[i][j][k].location(i, j, k);
                     if (rotateReq){
-                        this.cube[i][j][k].rotate(section ,phase, direction);
+                        this.cube[i][j][k].rotate(section ,phase, direction, rotationSpeed);
                     }
                     this.cube[i][j][k].setGlobalrotate(globalRotate);
 

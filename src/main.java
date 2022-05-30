@@ -9,6 +9,8 @@ import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -35,6 +37,7 @@ public class main extends JFrame implements GLEventListener, KeyListener{
     private float cameraAngleX = 0f;
     private float cameraAngleY = 0f;
     private float cameraAngleZ = 8f;
+    private float rotationSpeed = 200f;
     private boolean isLightOn;
     private final float[] HERE = {0.0f, 0.0f, 0.0f, 1.0f};
 
@@ -78,6 +81,7 @@ public class main extends JFrame implements GLEventListener, KeyListener{
             }
         });
 
+
         setLayout(new BorderLayout());
         add(canvas);
         JPanel panelBottom = new JPanel(new FlowLayout());
@@ -86,11 +90,13 @@ public class main extends JFrame implements GLEventListener, KeyListener{
         JButton btnPlus = new JButton("+");
         JButton btnMinus = new JButton("-");
         JButton btnLight = new JButton("Light");
+        JSlider sdlSpeed = new JSlider(JSlider.HORIZONTAL, 1, 40, 20);
         panelBottom.add(btnPlus);
         panelBottom.add(btnMinus);
         panelBottom.add(btnReset);
         panelBottom.add(btnShuffle);
         panelBottom.add(btnLight);
+        panelBottom.add(sdlSpeed);
         add(panelBottom, BorderLayout.SOUTH);
         setVisible(true);
         final FPSAnimator animator = new FPSAnimator(canvas,60,true);
@@ -101,6 +107,15 @@ public class main extends JFrame implements GLEventListener, KeyListener{
         btnMinus.addActionListener(e -> {if(size>3) size--;cube = new cube(gl, textures, size);});
         btnPlus.addActionListener(e -> { size++; cube = new cube(gl, textures, size);});
         btnLight.addActionListener(e -> isLightOn = !isLightOn);
+        sdlSpeed.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                JSlider source = (JSlider) e.getSource();
+                if(!source.getValueIsAdjusting()){
+                    rotationSpeed = source.getValue();
+                }
+            }
+        });
     }
     @Override
     public void keyTyped(KeyEvent e) {
@@ -188,7 +203,7 @@ public class main extends JFrame implements GLEventListener, KeyListener{
         } else {
             gl.glDisable(gl.GL_LIGHTING);
         }
-        cube.rebuild();
+        cube.rebuild(rotationSpeed);
 
         camera(aspect);
 

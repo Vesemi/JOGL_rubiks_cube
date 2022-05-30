@@ -4,7 +4,6 @@ import static com.jogamp.opengl.GL2.*;
 import com.jogamp.opengl.math.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,7 +11,7 @@ import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 
 public class qb{
-    private float rotation = (float)PI/30f;
+    private float rotation, speed;
     private int currentWall, currentColumn, currentRow;
     int wall, coll, row;
     private float move = 1f;
@@ -122,11 +121,18 @@ public class qb{
 
     void rotateRow(int direction,int row) {
         if ((currentRow == row )) {
+            if(!rotatingY){
+                stableMat = rotationManip((float) (-PI/2), axisY, calcMat);
+            }
+
             rotatingY = true;
         }
     }
     void rotateWall(int direction,int wall) {
         if ((currentWall == wall )) {
+            if(!rotatingZ) {
+                stableMat = rotationManip((float) (-PI / 2), axisZ, calcMat);
+            }
             rotatingZ = true;
         }
     }
@@ -134,10 +140,14 @@ public class qb{
     void rotateColumn(int direction, int coll) {
 
         if ((currentColumn == coll)) {
+            if (!rotatingX){
+            stableMat = rotationManip((float) (PI/2), axisX, calcMat);}
             rotatingX = true;
         }
     }
-    void rotate(int section, int phase, int direction){
+    void rotate(int section, int phase, int direction, float rotationSpeed){
+        speed = (float)rotationSpeed;
+        rotation = (float) ((float)2*PI/speed/4);
         switch (section){
             case 0 -> rotateWall(direction, phase);
             case 1 -> rotateColumn(direction, phase);
@@ -148,9 +158,51 @@ public class qb{
 
         if (this.rotatingY){
             tempRotateY +=1;
+            if (tempRotateY>speed){
+                tempRotateY = 0;
+                calcMat = stableMat;
+                this.rotatingY = false;
+            }else {
+                calcMat = rotationManip(-rotation, axisY, calcMat);
+            }
+        }else
+        if (this.rotatingX){
+            tempRotateX +=1;
+            if (tempRotateX>speed){
+                tempRotateX = 0;
+                calcMat = stableMat;
+                this.rotatingX = false;
+            }else {
+                calcMat = rotationManip(rotation, axisX, calcMat);
+            }
+        }else
+        if (rotatingZ){
+            tempRotateZ +=1;
+            if (tempRotateZ>speed){
+                tempRotateZ = 0;
+                calcMat = stableMat;
+                rotatingZ = false;
+
+            }else {
+                calcMat = rotationManip(-rotation, axisZ, calcMat);
+            }
+        }
+        rotating = this.rotatingX || this.rotatingY || this.rotatingZ;
+        globalMat.setIdentity();
+        globalMat.mult(rotationManip((float) Math.toRadians(globalRotate[1]), axisX, globalMat));
+        globalMat.mult(rotationManip((float) Math.toRadians(globalRotate[0]), axisY, globalMat));
+        globalMat.mult(calcMat);
+
+        gl.glLoadMatrixf(globalMat.toMatrix(tempMat4, 0), 0);
+    }
+    void preRotate2(){
+
+        if (this.rotatingY){
+            tempRotateY +=1;
             if (tempRotateY>15){
                 tempRotateY = 0;
                 this.rotatingY = false;
+                calcMat = rotationManip((float) (-PI/2), axisY, calcMat);
             }else {
                 calcMat = rotationManip(-rotation, axisY, calcMat);
             }
@@ -182,7 +234,6 @@ public class qb{
 
         gl.glLoadMatrixf(globalMat.toMatrix(tempMat4, 0), 0);
     }
-
 
     private Quaternion rotationManip(float angle, float[] axis, Quaternion currentMat){
         float[] tempVec3 = {0f,0f,0f};
