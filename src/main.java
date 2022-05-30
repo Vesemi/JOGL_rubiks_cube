@@ -5,9 +5,6 @@ import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
-import com.jogamp.opengl.util.glsl.ShaderCode;
-import com.jogamp.opengl.util.glsl.ShaderProgram;
-import com.jogamp.opengl.util.glsl.ShaderState;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 
@@ -22,12 +19,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.jogamp.opengl.GL.*;
-import static com.jogamp.opengl.GL2ES3.GL_QUADS;
 
 
 public class main extends JFrame implements GLEventListener, KeyListener{
 
-    private  GL2 GL ;
     private GLU glu = new GLU();
     private int size = 3;
     cube cube;
@@ -41,19 +36,10 @@ public class main extends JFrame implements GLEventListener, KeyListener{
     private float cameraAngleY = 0f;
     private float cameraAngleZ = 8f;
     private boolean isLightOn;
-    float white[] = {1, 1, 1, 1};
-    float black[] = {0, 0, 0, 1};
-    float red[] = {1, 0, 0, 1};
-    float green[] = {0, 1, 0, 1};
-    float blue[] = {0, 0, 1, 1};
-    float cyan[] = {0, 1, 1, 1};
-    float magenta[] = {1, 0, 1, 1};
-    float yellow[] = {1, 1, 0, 1};
-    float whitish[] = {0.7f, 0.7f, 0.7f, 1};
-    float position[] = {0, 0, 1, 0};
-    private GLUT glut;
+    private final float[] HERE = {0.0f, 0.0f, 0.0f, 1.0f};
+
+    float whitish[] = {0.2f, 0.2f, 0.2f, 1f};
     float roatationa = 0.0f;
-    private qb light;
 
     public main(String string) {
         super(string);
@@ -85,8 +71,8 @@ public class main extends JFrame implements GLEventListener, KeyListener{
                // if (e.getX() < mouseX - buffer) cameraAngleY += 10.0;
                // else if (e.getX() > mouseX + buffer) cameraAngleY -= 10.0;
 
-                if (e.getY() < mouseY - buffer) cameraAngleX += 10.0;
-                else if (e.getY() > mouseY + buffer) cameraAngleX -= 10.0;
+                if (e.getY() < mouseY - buffer) cameraAngleX -= 10.0;
+                else if (e.getY() > mouseY + buffer) cameraAngleX += 10.0;
                 mouseX = e.getX();
                 mouseY = e.getY();
             }
@@ -190,14 +176,13 @@ public class main extends JFrame implements GLEventListener, KeyListener{
         gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         gl.glLoadIdentity();
-        gl.glRotatef(roatationa, 0f, 0f, 1f);
-        gl.glTranslatef(7f, 0f, 0f);
-        Kostka.Draw(gl, 1f, 1);
-
-        float position[]={.0f,0.0f,0.0f,1.0f};
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, position,0);
-        roatationa += 0.5f;
+        gl.glRotatef(roatationa*-2, roatationa, roatationa*5f, 1f);
+        gl.glTranslatef((size+3)/2, 0f, 0f);
+        Kostka.Draw(gl, 0.2f, 1);
+        setLightPosition(GL2.GL_LIGHT1,HERE);
+        roatationa += 1f;
         cube.setCameraAngle(cameraAngleX, cameraAngleY, 0f);
+
         if (isLightOn) {
             gl.glEnable(gl.GL_LIGHTING);
         } else {
@@ -209,8 +194,10 @@ public class main extends JFrame implements GLEventListener, KeyListener{
 
         gl.glFlush();
 
+    }
 
-
+    private void setLightPosition(int light, float[] position) {
+        gl.glLightfv(light, GL2.GL_POSITION,position,0);
     }
 
     private void resetGlobalRotation()
@@ -228,49 +215,20 @@ public class main extends JFrame implements GLEventListener, KeyListener{
     public void init(GLAutoDrawable drawable) {
         gl=drawable.getGL().getGL2();
         glu=GLU.createGLU(gl);
-        glut=new GLUT();
         gl.glClearColor(0.5f, 0.5f, 1f, 1.0f);
         gl.glEnable(GL2.GL_DEPTH_TEST);
         gl.glEnable(GL_TEXTURE_2D);
         gl.glEnable(GL2.GL_CULL_FACE);
-        gl.glEnable(GL2.GL_SMOOTH);
-        gl.glEnable(GL2.GL_FLAT);
-        float matSpec[]={1.0f,1.0f,1.0f,1.0f};
-        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, matSpec, 0);
-        gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 128);
-
-        gl.glEnable(GL2.GL_COLOR_MATERIAL);
-        gl.glColorMaterial(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE);
-
-        float ambientLight[]={0.1f,0.1f,0.1f,1.0f};
-        gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, ambientLight, 0);
-
-        gl.glEnable(GL2.GL_LIGHTING);
-
-        float ambient[]={0.1f,0.1f,0.1f,0.2f};
-        float diffuse[]={0.5f,0.5f,0.5f,1.0f};
-        float specular[]={1.0f,1.0f,1.0f,1.0f};
-
-
-        gl.glLightfv(GL2.GL_LIGHT0,GL2.GL_AMBIENT,ambient,0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, diffuse,0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, specular,0);
-
-        gl.glEnable(GL2.GL_LIGHT0);
-    //   gl.glEnable(GL2.GL_NORMALIZE);
-
-        isLightOn = false;
+        setUpLight();
         Arrays.stream(colors).forEach((x) -> {
             try{
             File f=new File("textures/%s.png".formatted(x));
             Texture t=TextureIO.newTexture(f, true);
             textures.add(t.getTextureObject(gl));
-        }catch(IOException e){
-            e.printStackTrace();
-        }});
-
-
-
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+        });
         cube = new cube(gl, textures, size);
     }
 
@@ -284,9 +242,8 @@ public class main extends JFrame implements GLEventListener, KeyListener{
             height=1;
         aspect=(float)width/height;
         camera(aspect);
-
-
     }
+
 public void camera(float aspect){
     gl.glMatrixMode(GL2.GL_PROJECTION);
     gl.glLoadIdentity();
@@ -296,6 +253,24 @@ public void camera(float aspect){
                 0.0f, 0.0f, 1.0f);
     gl.glMatrixMode(GL2.GL_MODELVIEW);
     gl.glLoadIdentity();
+}
+
+private void setUpLight(){
+    //Spotlike
+    gl.glEnable(gl.GL_LIGHTING);
+    gl.glEnable(gl.GL_LIGHT1);
+    gl.glLightfv(gl.GL_LIGHT1, gl.GL_AMBIENT, FloatBuffer.wrap(whitish));
+    gl.glLightfv(gl.GL_LIGHT1, gl.GL_DIFFUSE, FloatBuffer.wrap(new float[] { 1f, 1f, 1f, 1f}));
+    gl.glLightf(gl.GL_LIGHT1, gl.GL_QUADRATIC_ATTENUATION, 0.2f);
+    //Ambient
+    gl.glEnable(gl.GL_LIGHT2);
+    gl.glLightfv(gl.GL_LIGHT2, gl.GL_AMBIENT, FloatBuffer.wrap(whitish));
+    gl.glLightfv(gl.GL_LIGHT2, gl.GL_DIFFUSE, FloatBuffer.wrap(new float[] { 0.4f, 0.4f, 0.4f, 1f}));
+
+
+    gl.glEnable(gl.GL_LIGHTING);
+
+    isLightOn = false;
 }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {

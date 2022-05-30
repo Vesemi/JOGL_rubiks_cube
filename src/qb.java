@@ -25,7 +25,7 @@ public class qb{
     private final float[] axisZ = {0f,0f,1f}, axisY = {0f,1f,0f}, axisX = {1f,0f,0f};
     private Quaternion calcMat = new Quaternion().setIdentity();
     private Quaternion globalMat = new Quaternion().setIdentity();
-    private Quaternion normalMat = new Quaternion().setIdentity();
+    private Quaternion stableMat = new Quaternion().setIdentity();
     float[] tempMat4 = {0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f};
     public List<Integer> textures = new ArrayList<Integer>();
     private float[] globalRotate = {0f,0f,0f};
@@ -190,10 +190,6 @@ public class qb{
         tempQuat.mult(new Quaternion().setFromAngleAxis(angle, axis, tempVec3));
         tempQuat.mult(currentMat);
         return tempQuat;
-    }
-    private float[] normalCalculations(){
-       float[] tempFloat = new float[] {0f,0f,0f} ;
-       return tempFloat;
     }
 
 
