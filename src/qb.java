@@ -19,6 +19,7 @@ public class qb{
     private float tempRotateY, tempRotateX, tempRotateZ = 0f;
     private final GL2 gl;
     private String qbTag;
+    private int direction = -1;
     private boolean rotatingX, rotatingY, rotatingZ;
     public String[] colors = {"", "", "", "", "", ""};
     private final float[] axisZ = {0f,0f,1f}, axisY = {0f,1f,0f}, axisX = {1f,0f,0f};
@@ -86,72 +87,92 @@ public class qb{
         preRotate();
         translateGL( wall, coll, row, size);
 
-      //  gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION, lightDiffusePosition, 0);
-      // if (!Objects.equals(colors[0], "")) { //Colors 0 First Wall
-            wallFWD(colors[0]);
-       // }
-        //if (!Objects.equals(colors[1], "")) { //Colors 1 Last Wall
-            wallBWD(colors[1]);
-       // }
-       // if (!Objects.equals(colors[2], "")) { //Colors 2 Last Column
-            wallRight(colors[2]);
-       // }
-      //  if (!Objects.equals(colors[3], "")) { //Colors 3 First Column
-            wallLeft(colors[3]);
-      //  }
-     //   if (!Objects.equals(colors[4], "")) { //Colors 4 First Row
-            wallDOWN(colors[4]);
-     //   }
-     ///   if (!Objects.equals(colors[5], "")) { //Colors 5 Last Row
-            wallUP(colors[5]);
-    //    }
+        //draw walls
+        wallFWD(colors[0]);
+        wallBWD(colors[1]);
+        wallRight(colors[2]);
+        wallLeft(colors[3]);
+        wallDOWN(colors[4]);
+        wallUP(colors[5]);
+    }
 
-    }
-    private float limitRotate(float rotate){
-        //to not over rotate check
-        if(rotate>=PI/2) return (float)PI/2;
-        else if(rotate <= -PI/2) return (float)(PI/2)*-1;
-        else return 0f;
-    }
     private void translateGL(int wall, int coll, int row, int size)
     {
         gl.glTranslatef((size-3)/2f, (size-3)/2f, (size-3)/2f);
         gl.glTranslatef(-coll+1f, -row+1f, -wall+1f);
     }
 
-    void rotateRow(int direction,int row) {
+    void rotateRow(int row) {
         if ((currentRow == row )) {
             if(!rotatingY){
-                stableMat = rotationManip((float) (-PI/2), axisY, calcMat);
+                direction = -1;
+                stableMat = calcRotationQuaternion((float) (-PI/2), axisY, calcMat);
             }
 
             rotatingY = true;
         }
     }
-    void rotateWall(int direction,int wall) {
+    void rotateWall(int wall) {
         if ((currentWall == wall )) {
             if(!rotatingZ) {
-                stableMat = rotationManip((float) (-PI / 2), axisZ, calcMat);
+                direction = -1;
+                stableMat = calcRotationQuaternion((float) (-PI / 2), axisZ, calcMat);
             }
             rotatingZ = true;
         }
     }
 
-    void rotateColumn(int direction, int coll) {
+    void rotateColumn(int coll) {
 
         if ((currentColumn == coll)) {
             if (!rotatingX){
-            stableMat = rotationManip((float) (PI/2), axisX, calcMat);}
+                direction = 1;
+            stableMat = calcRotationQuaternion((float) (PI/2), axisX, calcMat);}
             rotatingX = true;
         }
     }
-    void rotate(int section, int phase, int direction, float rotationSpeed){
-        speed = (float)rotationSpeed;
-        rotation = (float) ((float)2*PI/speed/4);
+
+    void rotateRowCCw(int row) {
+        if ((currentRow == row )) {
+            if(!rotatingY){
+                direction = 1;
+                stableMat = calcRotationQuaternion((float) (PI/2), axisY, calcMat);
+            }
+
+            rotatingY = true;
+        }
+    }
+    void rotateWallCCw(int wall) {
+        if ((currentWall == wall )) {
+            if(!rotatingZ) {
+                direction = 1;
+                stableMat = calcRotationQuaternion((float) (PI / 2), axisZ, calcMat);
+            }
+            rotatingZ = true;
+        }
+    }
+
+    void rotateColumnCCw(int coll) {
+
+        if ((currentColumn == coll)) {
+            if (!rotatingX){
+                direction = -1;
+                stableMat = calcRotationQuaternion((float) (-PI/2), axisX, calcMat);}
+            rotatingX = true;
+        }
+    }
+    void rotate(int section, int phase, float rotationSpeed){
+        this.speed = rotationSpeed;
+        rotation = (float) ((float)2*PI/ this.speed /4);
         switch (section){
-            case 0 -> rotateWall(direction, phase);
-            case 1 -> rotateColumn(direction, phase);
-            case 2 -> rotateRow(direction, phase);
+            case 0 -> rotateWall(phase);
+            case 1 -> rotateColumn(phase);
+            case 2 -> rotateRow(phase);
+
+            case 3 -> rotateWallCCw(phase);
+            case 4 -> rotateColumnCCw(phase);
+            case 5 -> rotateRowCCw(phase);
+
         }
     }
     void preRotate(){
@@ -163,7 +184,7 @@ public class qb{
                 calcMat = stableMat;
                 this.rotatingY = false;
             }else {
-                calcMat = rotationManip(-rotation, axisY, calcMat);
+                calcMat = calcRotationQuaternion(direction*rotation, axisY, calcMat);
             }
         }else
         if (this.rotatingX){
@@ -173,7 +194,7 @@ public class qb{
                 calcMat = stableMat;
                 this.rotatingX = false;
             }else {
-                calcMat = rotationManip(rotation, axisX, calcMat);
+                calcMat = calcRotationQuaternion(direction*rotation, axisX, calcMat);
             }
         }else
         if (rotatingZ){
@@ -184,58 +205,21 @@ public class qb{
                 rotatingZ = false;
 
             }else {
-                calcMat = rotationManip(-rotation, axisZ, calcMat);
+                calcMat = calcRotationQuaternion(direction*rotation, axisZ, calcMat);
             }
         }
+
         rotating = this.rotatingX || this.rotatingY || this.rotatingZ;
+
         globalMat.setIdentity();
-        globalMat.mult(rotationManip((float) Math.toRadians(globalRotate[1]), axisX, globalMat));
-        globalMat.mult(rotationManip((float) Math.toRadians(globalRotate[0]), axisY, globalMat));
-        globalMat.mult(calcMat);
-
-        gl.glLoadMatrixf(globalMat.toMatrix(tempMat4, 0), 0);
-    }
-    void preRotate2(){
-
-        if (this.rotatingY){
-            tempRotateY +=1;
-            if (tempRotateY>15){
-                tempRotateY = 0;
-                this.rotatingY = false;
-                calcMat = rotationManip((float) (-PI/2), axisY, calcMat);
-            }else {
-                calcMat = rotationManip(-rotation, axisY, calcMat);
-            }
-        }else
-        if (this.rotatingX){
-            tempRotateX +=1;
-            if (tempRotateX>15){
-                tempRotateX = 0;
-                this.rotatingX = false;
-            }else {
-                calcMat = rotationManip(rotation, axisX, calcMat);
-            }
-        }else
-        if (rotatingZ){
-            tempRotateZ +=1;
-            if (tempRotateZ>15){
-                tempRotateZ = 0;
-                rotatingZ = false;
-
-            }else {
-                calcMat = rotationManip(-rotation, axisZ, calcMat);
-            }
-        }
-        rotating = this.rotatingX || this.rotatingY || this.rotatingZ;
-        globalMat.setIdentity();
-        globalMat.mult(rotationManip((float) Math.toRadians(globalRotate[1]), axisX, globalMat));
-        globalMat.mult(rotationManip((float) Math.toRadians(globalRotate[0]), axisY, globalMat));
+        globalMat.setFromEuler((float)Math.toRadians(globalRotate[0]), (float)Math.toRadians(globalRotate[1]), 0f);
         globalMat.mult(calcMat);
 
         gl.glLoadMatrixf(globalMat.toMatrix(tempMat4, 0), 0);
     }
 
-    private Quaternion rotationManip(float angle, float[] axis, Quaternion currentMat){
+
+    private Quaternion calcRotationQuaternion(float angle, float[] axis, Quaternion currentMat){
         float[] tempVec3 = {0f,0f,0f};
         Quaternion tempQuat = new Quaternion().setIdentity();
         tempQuat.mult(new Quaternion().setFromAngleAxis(angle, axis, tempVec3));

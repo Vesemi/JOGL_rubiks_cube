@@ -28,7 +28,7 @@ public class cube{
             }
         }
     }
-    void rotateColumnLeft(int coll){
+    void rotateColumn(int coll, int direction){
         int cubeLength = this.cube.length;
         for( int wall=0; wall<cubeLength;wall++){
             for(int row = 0; row<wall;row++){
@@ -37,54 +37,89 @@ public class cube{
                 this.setQb(temp,row,coll,wall);;
             }
         }
-        for( int wall=0; wall<cubeLength;wall++){
-            for(int row = 0; row<cubeLength/2;row++){
-                qb temp = this.getQb(wall,coll,row);
-                this.setQb(this.getQb(wall, coll,cubeLength-row-1),wall,coll,row);
-                this.setQb(temp, wall, coll,cubeLength-row-1);
+        if (direction == -1)
+        {
+            for (int i = 0; i < cubeLength; i++) {
+                for (int j = 0; j < cubeLength / 2; j++) {
+                    qb temp = this.getQb(j, coll, i);
+                    this.setQb(this.getQb(cubeLength - j - 1, coll,i ), j, coll, i);
+                    this.setQb(temp, cubeLength - j - 1, coll, i);
+                }
             }
+
+        }
+        else{
+            for (int i = 0; i < cubeLength; i++) {
+                for (int j = 0; j < cubeLength / 2; j++) {
+                    qb temp = this.getQb(i, coll, j);
+                    this.setQb(this.getQb(i, coll, cubeLength - j - 1), i, coll, j);
+                    this.setQb(temp, i, coll, cubeLength - j - 1);
+                }
+            }
+
         }
     }
-    private void setRotation(int section, int phase, int direction){
-        this.section = section;
-        this.phase = phase;
-        this.direction = direction;
-    }
-    void rotateRowLeft(int row){
+
+
+    void rotateRow(int row, int direction){
         int cubeLength = this.cube.length;
 
-        for( int wall=0; wall<cubeLength;wall++){
-            for(int column = 0; column<wall;column++){
-                qb temp = this.getQb(wall,column,row);
-                this.setQb(this.getQb(column,wall,row), wall, column, row);
-                this.setQb(temp, column,wall,row);
+        for( int i=0; i<cubeLength;i++){
+            for(int j = 0; j<i;j++){
+                qb temp = this.getQb(i,j,row);
+                this.setQb(this.getQb(j,i,row), i, j, row);
+                this.setQb(temp, j,i,row);
             }
         }
-        for( int i=0; i<cubeLength;++i){
-            for(int j = 0; j<cubeLength/2;++j){
-                qb temp = getQb(i, j ,row);
-                this.setQb(this.getQb(i, cubeLength-j-1, row), i,j,row);
-                this.setQb(temp, i,cubeLength-j-1, row);
+        if (direction == 1)
+        {
+            for( int i=0; i<cubeLength;++i){
+                for(int j = 0; j<cubeLength/2;++j){
+                    qb temp = getQb(i, j ,row);
+                    this.setQb(this.getQb(i, cubeLength-j-1, row), i,j,row);
+                    this.setQb(temp, i,cubeLength-j-1, row);
+            }
+        }
+        }else
+        {
+            for (int i = 0; i < cubeLength; ++i) {
+                for (int j = 0; j < cubeLength / 2; ++j) {
+                    qb temp = getQb(j, i, row);
+                    this.setQb(this.getQb(cubeLength - j - 1, i, row), j, i, row);
+                    this.setQb(temp, cubeLength - j - 1, i, row);
+                }
             }
         }
     }
-    void rotateWallLeft(int wall){
+    void rotateWall(int wall, int direction){
         int cubeLength = this.cube.length;
-        for( int column=0; column<cubeLength;column++){
-            for(int row = 0; row<column;row++){
-                qb temp = this.getQb(wall,column,row);
-                this.setQb(this.getQb(wall, row,column), wall, column, row);
-                this.setQb(temp,wall, row, column);
+        for( int i=0; i<cubeLength;i++){
+            for(int j = 0; j<i;j++){
+                qb temp = this.getQb(wall,i,j);
+                this.setQb(this.getQb(wall, j,i), wall, i, j);
+                this.setQb(temp,wall, j, i);
             }
         }
 
-        for( int i=0; i<cubeLength;++i){
-            for(int j = 0; j<cubeLength/2;++j){
-                qb temp = getQb(wall, i, j );
-                this.setQb(this.getQb(wall, i, cubeLength-j-1),wall, i,j);
-                this.setQb(temp,wall,  i,cubeLength-j-1);
+        if(direction == 1) {
+            for (int i = 0; i < cubeLength; ++i) {
+                for (int j = 0; j < cubeLength / 2; ++j) {
+                    qb temp = getQb(wall, i, j);
+                    this.setQb(this.getQb(wall, i, cubeLength - j - 1), wall, i, j);
+                    this.setQb(temp, wall, i, cubeLength - j - 1);
+                }
             }
         }
+        else{
+            for (int i = 0; i < cubeLength; ++i) {
+                for (int j = 0; j < cubeLength / 2; ++j) {
+                    qb temp = getQb(wall, j, i);
+                    this.setQb(this.getQb(wall, cubeLength - j - 1, i), wall, j, i);
+                    this.setQb(temp, wall, cubeLength - j - 1, i );
+                }
+            }
+        }
+
     }
     private qb getQb(int wall, int column, int row){
         return this.cube[wall][column][row];
@@ -101,15 +136,14 @@ public class cube{
             for( int j = 0;j<this.size;j++){ //column
 
                 for( int k = 0;k<this.size;k++){ // rows
-                    gl.glPushMatrix();
+                   // gl.glPushMatrix();
                     this.cube[i][j][k].location(i, j, k);
                     if (rotateReq){
-                        this.cube[i][j][k].rotate(section ,phase, direction, rotationSpeed);
+                        this.cube[i][j][k].rotate(section ,phase, rotationSpeed);
                     }
                     this.cube[i][j][k].setGlobalrotate(globalRotate);
-
                     drawQb(i,j,k);
-                    gl.glPopMatrix();
+                   // gl.glPopMatrix();
                                     }
             }
             allowRotate = true;
@@ -119,9 +153,13 @@ public class cube{
         if (rotateReq && allowRotate && !this.isRotating()) {
 
             switch (section){
-                case 0 -> rotateWallLeft(phase);
-                case 1 -> rotateColumnLeft(phase);
-                case 2 -> rotateRowLeft(phase);
+                case 0 -> rotateWall(phase, 1);
+                case 1 -> rotateColumn(phase, 1);
+                case 2 -> rotateRow(phase, 1);
+
+                case 3 -> rotateWall(phase, -1);
+                case 4 -> rotateColumn(phase, -1);
+                case 5 -> rotateRow(phase, -1);
             }
             stopRotate();
         }
@@ -147,18 +185,18 @@ public class cube{
         }
 
     public void startRotate(int section, int phase, int direction){
-        if (!this.rotateReq && !this.isRotating()){
+        if (!this.rotateReq && !this.isRotating())
+        {
             this.setRotation(section, phase, direction);
             this.rotateReq = true;
         }
 
     }
-    public void globalRotateX(int direction){
-        if (!this.rotateReq && !this.isRotating()){
-            this.setRotation(section, phase, direction);
-            this.rotateReq = true;
-        }
 
+    private void setRotation(int section, int phase, int direction){
+        this.section = section;
+        this.phase = phase;
+        this.direction = direction;
     }
 
     private void drawQb(int i, int j, int k) {
@@ -174,7 +212,7 @@ public class cube{
         shuffleTimes -= 1;
         if (shuffleTimes == 0) shuffle = false;
         Random rand = new Random();
-        this.startRotate(rand.nextInt(size), rand.nextInt(size), rand.nextInt(size));
+        this.startRotate(rand.nextInt(6), rand.nextInt(size), rand.nextInt(size));
     }
 
     public void setCameraAngle(float cameraAngleX, float cameraAngleY, float cameraAngleZ) {
